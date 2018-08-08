@@ -2,5 +2,5 @@
 
 NECESSARY DEPS:
 
-*Netifaces
-*python-nmap
+ * Netifaces
+ * python-nmap
