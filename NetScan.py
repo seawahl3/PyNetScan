@@ -1,17 +1,17 @@
 import os
 import sys
-import nmap as nm
+import nmap
 from math import log2
 import netifaces as ni
 
 def main():
-	ifname = input("Enter the name of the interface to scan: ")
-	ip = getIP(ifname)
-	netmask = getSub(ifname)
-	cidr = convertToCidr(netmask)
-	network = network_ip(ip, netmask)
-	print("IPADDR: "+ip+"\nNETMASK: "+netmask+"\nCIDR: "+str(cidr)+"\nNetwork: "+network)
-	#activeIPs = scanNet(ip, cidr)
+	#ifname = input("Enter the name of the interface to scan: ")
+	#ip = getIP(ifname)
+	#netmask = getSub(ifname)
+	cidr = str("25") #convertToCidr(netmask)
+	network = str("10.200.21.0")#network_ip(ip, netmask)
+	#print("IPADDR: "+ip+"\nNETMASK: "+netmask+"\nCIDR: "+str(cidr)+"\nNetwork: "+network)
+	activeIPs = scanNet(network, cidr)
 
 def network_ip(ip, netmask):
 	network = list()
@@ -42,10 +42,33 @@ def convertToCidr(netmask):
 		cidr+=i
 	return cidr
 
-#def scanNet(ip, cidr):
-#	hosts = str(ip+"/"+cidr)
-#	nm=nm.PortScanner()
-#	nm.scan(hosts=hosts, arguuments= )
+def scanNet(network, cidr):
+	hosts = str(network+"/"+cidr)
+	nm = nmap.PortScannerAsync()
+	nm.scan(hosts=hosts, arguments='-O', callback=callback)
+	while nm.still_scanning():
+		print("\nScanning...")
+		nm.wait(30)
+
+
+def callback(host, scan_result):
+	alive = str(scan_result['nmap']['scanstats']['uphosts'])
+	print(host+" uphosts: "+alive)
+	if alive is "1":
+		print(host)
+		hostnames = scan_result['scan'][host]['hostnames']
+		hostdict = dict()
+		for item in hostnames:
+			hostdict.update(item)
+		print("\n\tHostname: "+str(hostdict['name']))
+		ostype = scan_result['scan'][host]['osmatch']
+		osdict = dict()
+		for item in ostype:
+			osdict.update(item)
+		print(len(osdict))
+		#print("\tOS Type: "+str(osdict['name']))
+		print("\n")
+
 	
 main()
 
