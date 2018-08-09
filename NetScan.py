@@ -23,14 +23,10 @@ def network_ip(ip, netmask):
 
 
 def getIP(ifname):
-	#ni.ifaddresses(ifname)
-	ip = ni.ifaddresses(ifname)[ni.AF_INET][0]['addr']
-	return ip
+	return ni.ifaddresses(ifname)[ni.AF_INET][0]['addr']
 
 def getSub(ifname):
-	#ni.ifaddresses(ifname)
-	netmask = ni.ifaddresses(ifname)[ni.AF_INET][0]['netmask']
-	return netmask
+	return ni.ifaddresses(ifname)[ni.AF_INET][0]['netmask']
 
 def convertToCidr(netmask):
 	netmask = netmask.split('.')
@@ -71,4 +67,3 @@ def callback(host, scan_result):
 
 	
 main()
-
