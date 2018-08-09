@@ -9,8 +9,18 @@ def main():
 	ip = getIP(ifname)
 	netmask = getSub(ifname)
 	cidr = convertToCidr(netmask)
-	print("IPADDR: "+ip+"\nNETMASK: "+netmask+"\nCIDR: "+str(cidr))
+	network = network_ip(ip, netmask)
+	print("IPADDR: "+ip+"\nNETMASK: "+netmask+"\nCIDR: "+str(cidr)+"\nNetwork: "+network)
 	#activeIPs = scanNet(ip, cidr)
+
+def network_ip(ip, netmask):
+	network = list()
+	b_IP = map(lambda x: bin(x)[2:].zfill(8), map(int, ip.split('.')))
+	b_Mask = map(lambda x: bin(x)[2:].zfill(8), map(int, netmask.split('.')))
+	for x, y in zip(b_IP, b_Mask):
+		network.append(int(x, 2) & int(y, 2))
+	return (".".join(map(str, network)))
+
 
 def getIP(ifname):
 	#ni.ifaddresses(ifname)
