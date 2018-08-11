@@ -14,6 +14,7 @@ def main():
 		Print('''This script needs NMAP to work correctly
 				  You can install it via the following command:
 				  'pip install nmap' ''')
+		exit(0)
 
 	ifname = input("Enter the name of the interface to scan: ")
 	ip = getIP(ifname)
