@@ -52,7 +52,7 @@ def convertToCidr(netmask):
 def scanNet(network, cidr):
 	hosts = str(str(network)+"/"+str(cidr))
 	nm = nmap.PortScannerAsync()
-	nm.scan(hosts=hosts, arguments='-O --fuzzy', callback=callback)
+	nm.scan(hosts=hosts, arguments='-O -Pn', callback=callback)
 	spinner = itertools.cycle(['Scanning', 'SCanning', 'ScAnning', 'ScaNning', 'ScanNing', 'ScannIng', 'ScanniNg', 'ScanninG'])
 	print("\n")
 	while nm.still_scanning():
@@ -63,7 +63,7 @@ def scanNet(network, cidr):
 
 def callback(host, scan_result):
 	alive = str(scan_result['nmap']['scanstats']['uphosts'])
-	#print(host+" uphosts: "+alive)
+	print(host+" uphosts: "+alive)
 	if alive is "1":
 		print("\n\n"+host)
 		hostnames = scan_result['scan'][host]['hostnames']
@@ -74,15 +74,15 @@ def callback(host, scan_result):
 			print("\n\tHostname: Unknown")
 		else:
 			print("\n\tHostname: "+str(hostdict['name']))
-		#ostype = scan_result['scan'][host]['osmatch']
-		#if ostype:
-		#	osdict = dict()
-		#	for item in ostype:
-		#		osdict.update(item)
-		#	print("\tOS Type: "+str(osdict['name']))
-		#	print("\n")
-		#else:
-		#	print("\tOS Type: Unknown\n")
+		ostype = scan_result['scan'][host]['osmatch']
+		if ostype:
+			osdict = dict()
+			for item in ostype:
+				osdict.update(item)
+			print("\tOS Type: "+str(osdict['name']))
+			print("\n")
+		else:
+			print("\tOS Type: Unknown\n")
 		#if scan_result['scan'][host]['tcp']:
 		#	print("\tOpen Ports: "+list(plist.keys()))
 		#else:
