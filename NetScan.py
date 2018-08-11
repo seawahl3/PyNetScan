@@ -16,7 +16,7 @@ def main():
 				  'pip install nmap' ''')
 		exit(0)
 
-	ifname = input("Enter the name of the interface to scan: ")
+	ifname = input("Enter the name of the interface to scan (ex. eth0): ")
 	ip = getIP(ifname)
 	netmask = getSub(ifname)
 	cidr = convertToCidr(netmask)
