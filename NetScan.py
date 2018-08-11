@@ -9,6 +9,7 @@ from math import log2
 #from modules.netifaces 
 import netifaces as ni
 
+#main, runs through each step of the process, checks for nmap, gets the interface and from the interface it gets ip, mask, networ addr, converts to cidr, passes it all to nmap
 def main():
 	if which('nmap') is None:
 		Print('''This script needs NMAP to work correctly
@@ -24,6 +25,7 @@ def main():
 	print("IPADDR: "+ip+"\nNETMASK: "+netmask+"\nCIDR: "+str(cidr)+"\nNetwork: "+network)
 	activeIPs = scanNet(network, cidr)
 
+#gets the network ip using the ip and netmask
 def network_ip(ip, netmask):
 	network = list()
 	b_IP = map(lambda x: bin(x)[2:].zfill(8), map(int, ip.split('.')))
@@ -32,13 +34,15 @@ def network_ip(ip, netmask):
 		network.append(int(x, 2) & int(y, 2))
 	return (".".join(map(str, network)))
 
-
+#gets the ip addr from the specified interface
 def getIP(ifname):
 	return ni.ifaddresses(ifname)[ni.AF_INET][0]['addr']
 
+#gets the mask from the specified interface
 def getSub(ifname):
 	return ni.ifaddresses(ifname)[ni.AF_INET][0]['netmask']
 
+#takes the mask and converts to cidr notation
 def convertToCidr(netmask):
 	netmask = netmask.split('.')
 	cidr = 0
@@ -49,6 +53,7 @@ def convertToCidr(netmask):
 		cidr+=i
 	return cidr
 
+#passes the network addr and cidr to nmap amd tells nmap to get the OS and ports and to pass output to callback()
 def scanNet(network, cidr):
 	hosts = str(str(network)+"/"+str(cidr))
 	nm = nmap.PortScannerAsync()
@@ -61,6 +66,7 @@ def scanNet(network, cidr):
 	    sys.stdout.flush()
 	    sys.stdout.write('\b\b\b\b\b\b\b\b')
 
+#takes the output from nmap, formats it, and writes it to std_out
 def callback(host, scan_result):
 	alive = str(scan_result['nmap']['scanstats']['uphosts'])
 	print(host+" uphosts: "+alive)
@@ -83,8 +89,4 @@ def callback(host, scan_result):
 			print("\n")
 		else:
 			print("\tOS Type: Unknown\n")
-		#if scan_result['scan'][host]['tcp']:
-		#	print("\tOpen Ports: "+list(plist.keys()))
-		#else:
-		#	print("\tOpen Ports: None")
 main()
