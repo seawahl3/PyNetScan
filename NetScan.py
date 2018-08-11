@@ -1,19 +1,26 @@
 import os
 import sys
-import nmap
+from modules.python_nmap import nmap
 import itertools
 import sys
 import time
+from shutil import which
 from math import log2
+#from modules.netifaces 
 import netifaces as ni
 
 def main():
-	#ifname = input("Enter the name of the interface to scan: ")
-	#ip = getIP(ifname)
-	#netmask = getSub(ifname)
-	cidr = str("25") #convertToCidr(netmask)
-	network = str("10.200.21.0")#network_ip(ip, netmask)
-	#print("IPADDR: "+ip+"\nNETMASK: "+netmask+"\nCIDR: "+str(cidr)+"\nNetwork: "+network)
+	if which('nmap') is None:
+		Print('''This script needs NMAP to work correctly
+				  You can install it via the following command:
+				  'pip install nmap' ''')
+
+	ifname = input("Enter the name of the interface to scan: ")
+	ip = getIP(ifname)
+	netmask = getSub(ifname)
+	cidr = convertToCidr(netmask)
+	network = network_ip(ip, netmask)
+	print("IPADDR: "+ip+"\nNETMASK: "+netmask+"\nCIDR: "+str(cidr)+"\nNetwork: "+network)
 	activeIPs = scanNet(network, cidr)
 
 def network_ip(ip, netmask):
@@ -42,7 +49,7 @@ def convertToCidr(netmask):
 	return cidr
 
 def scanNet(network, cidr):
-	hosts = str(network+"/"+cidr)
+	hosts = str(str(network)+"/"+str(cidr))
 	nm = nmap.PortScannerAsync()
 	nm.scan(hosts=hosts, arguments='-O --fuzzy', callback=callback)
 	spinner = itertools.cycle(['Scanning', 'SCanning', 'ScAnning', 'ScaNning', 'ScanNing', 'ScannIng', 'ScanniNg', 'ScanninG'])
@@ -66,23 +73,17 @@ def callback(host, scan_result):
 			print("\n\tHostname: Unknown")
 		else:
 			print("\n\tHostname: "+str(hostdict['name']))
-		ostype = scan_result['scan'][host]['osmatch']
-		if ostype:
-			osdict = dict()
-			for item in ostype:
-				osdict.update(item)
-			print("\tOS Type: "+str(osdict['name']))
-			print("\n")
-		else:
-			print("\tOS Type: Unknown\n")
-		if scan_result['scan'][host]['tcp']:
-			print("\tOpen Ports: "+list(plist.keys()))
-		else:
-			print("\tOpen Ports: None")
-
-
-
-
-
-	
+		#ostype = scan_result['scan'][host]['osmatch']
+		#if ostype:
+		#	osdict = dict()
+		#	for item in ostype:
+		#		osdict.update(item)
+		#	print("\tOS Type: "+str(osdict['name']))
+		#	print("\n")
+		#else:
+		#	print("\tOS Type: Unknown\n")
+		#if scan_result['scan'][host]['tcp']:
+		#	print("\tOpen Ports: "+list(plist.keys()))
+		#else:
+		#	print("\tOpen Ports: None")
 main()
